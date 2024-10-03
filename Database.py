@@ -61,7 +61,7 @@ with sl.connect("databaseVSU.db") as database:
                         ID_teacher INTEGER,
                         FOREIGN KEY(ID_teacher) REFERENCES teachers(ID_teacher));""")
     
-    with open("table_data.csv", newline='') as f:
+    with open("table_data.csv", newline='', encoding='utf-8') as f:
         reader = csv.reader(f)
         header = next(reader)
         insert_values = [(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]) for row in reader]
