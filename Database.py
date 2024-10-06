@@ -81,6 +81,13 @@ with sl.connect("databaseVSU.db") as database:
     insert_query_teachers = "INSERT INTO teachers (ID_teacher,ID_subject,name,surname,email) VALUES (?,?,?,?,?)"  
     cursor.executemany(insert_query_teachers, insert_values)
 
+    with open("groups_data.csv", newline='', encoding='utf-8') as f3:
+        reader = csv.reader(f3)
+        header = next(reader)
+        insert_values = [(row[0], row[1], row[2]) for row in reader]
+    insert_query_groups = "INSERT INTO groups (ID_group, titleGroup, ID_teacher) VALUES (?,?,?)"  
+    cursor.executemany(insert_query_groups, insert_values)
+
 database.commit()
 
 cursor.close()
