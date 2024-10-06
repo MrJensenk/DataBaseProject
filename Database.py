@@ -9,10 +9,10 @@ with sl.connect("databaseVSU.db") as database:
                     ID_student INTEGER PRIMARY KEY AUTOINCREMENT,
                     ID_kur INTEGER,
                     ID_group INTEGER,
-                    name VARCHAR(60),
+                    name VARCHAR(60) NOT NULL,
                     surname VARCHAR(60),
                     age INTEGER,  
-                    email TEXT,
+                    email TEXT NOT NULL, 
                     passport VARCHAR(6),
                     FOREIGN KEY(ID_kur) REFERENCES kurators(ID_kur),
                     FOREIGN KEY(ID_group) REFERENCES groups(ID_group));""")
@@ -24,7 +24,6 @@ with sl.connect("databaseVSU.db") as database:
                         name VARCHAR(60) NOT NULL,
                         surname VARCHAR(60) NOT NULL,
                         email TEXT,
-                        specialization TEXT,
                         FOREIGN KEY(ID_subject) REFERENCES subjects(ID_subject));""")      
                         
                                     
@@ -67,6 +66,20 @@ with sl.connect("databaseVSU.db") as database:
         insert_values = [(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]) for row in reader]
     insert_query = "INSERT INTO students (ID_student,ID_kur,ID_group,name,surname,age,email,passport) VALUES (?,?,?,?,?,?,?,?)"  
     cursor.executemany(insert_query, insert_values)
+
+    with open("subjects_data.csv", newline='', encoding='utf-8') as f1:
+        reader = csv.reader(f1)
+        header = next(reader)
+        insert_values = [(row[0], row[1]) for row in reader]
+    insert_query_subjects = "INSERT INTO subjects (ID_subject,title) VALUES (?,?)"
+    cursor.executemany(insert_query_subjects, insert_values)
+
+    with open("teachers_data.csv", newline='', encoding='utf-8') as f2:
+        reader = csv.reader(f2)
+        header = next(reader)
+        insert_values = [(row[0], row[1], row[2], row[3], row[4]) for row in reader]
+    insert_query_teachers = "INSERT INTO teachers (ID_teacher,ID_subject,name,surname,email) VALUES (?,?,?,?,?)"  
+    cursor.executemany(insert_query_teachers, insert_values)
 
 database.commit()
 
