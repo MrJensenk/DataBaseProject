@@ -92,3 +92,4 @@ database.commit()
 
 cursor.close()
 database.close()
+
