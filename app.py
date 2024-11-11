@@ -1,84 +1,47 @@
-from flask import Flask, render_template 
-from flask_sqlalchemy import SQLAlchemy 
+from flask import Flask, render_template
+import sqlite3 as sl
+from Database import create_database
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///databaseVSU.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
 
-# Определение моделей
-class Student(db.Model):
-    __tablename__ = 'students'
-    ID_student = db.Column(db.Integer, primary_key=True)
-    ID_kur = db.Column(db.Integer, db.ForeignKey('kurators.ID_kur'))
-    ID_group = db.Column(db.Integer, db.ForeignKey('groups.ID_group'))
-    name = db.Column(db.String(60), nullable=False)
-    surname = db.Column(db.String(60))
-    age = db.Column(db.Integer)
-    email = db.Column(db.String, nullable=False)
-    passport = db.Column(db.String(6))
+# Создаем базу данных и загружаем данные из CSV
+create_database()
 
-class Teacher(db.Model):
-    __tablename__ = 'teachers'
-    ID_teacher = db.Column(db.Integer, primary_key=True)
-    ID_subject = db.Column(db.Integer, db.ForeignKey('subjects.ID_subject'))
-    name = db.Column(db.String(60), nullable=False)
-    surname = db.Column(db.String(60), nullable=False)
-    email = db.Column(db.String)
-
-class Subject(db.Model):
-    __tablename__ = 'subjects'
-    ID_subject = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, nullable=False)
-
-class Kurator(db.Model):
-    __tablename__ = 'kurators'
-    ID_kur = db.Column(db.Integer, primary_key=True)
-    ID_kurs = db.Column(db.Integer, db.ForeignKey('kurses.ID_kurs'))
-    name = db.Column(db.String(60), nullable=False)
-    surname = db.Column(db.String(60), nullable=False)
-    email = db.Column(db.String)
-
-class Kurses(db.Model):
-    __tablename__ = 'kurses'
-    ID_kurs = db.Column(db.Integer, primary_key=True)
-    ID_subject = db.Column(db.Integer, db.ForeignKey('subjects.ID_subject'))
-    ID_teacher = db.Column(db.Integer, db.ForeignKey('teachers.ID_teacher'))
-    title = db.Column(db.String, nullable=False)
-    time = db.Column(db.Integer)
-    cost = db.Column(db.Integer)
-    dateStart = db.Column(db.String)
-
-class Group(db.Model):
-    __tablename__ = 'groups'
-    ID_group = db.Column(db.Integer, primary_key=True)
-    titleGroup = db.Column(db.String(100), nullable=False, unique=True)
-    ID_teacher = db.Column(db.Integer, db.ForeignKey('teachers.ID_teacher'))
+def get_data_from_table(table_name):
+    with sl.connect("databaseVSU.db") as database:
+        cursor = database.cursor()
+        cursor.execute(f"SELECT * FROM {table_name}")
+        data = cursor.fetchall()
+    return data
 
 @app.route('/')
 def index():
-    tables = db.engine.table_names()
-    print("Tables in the database:", tables)  # Добавлено для отладки
-    return render_template('index.html', tables=tables)
+    return render_template('index.html')
 
-@app.route('/table/<table_name>')
-def view_table(table_name):
-    if table_name == 'students':
-        rows = Student.query.all()
-    elif table_name == 'teachers':
-        rows = Teacher.query.all()
-    elif table_name == 'subjects':
-        rows = Subject.query.all()
-    elif table_name == 'kurators':
-        rows = Kurator.query.all()
-    elif table_name == 'kurses':
-        rows = Kurses.query.all()
-    elif table_name == 'groups':
-        rows = Group.query.all()
-    else:
-        return "Таблица не найдена", 404
-    
-    return render_template('table.html', table_name=table_name, rows=rows)
+@app.route('/students')
+def view_students():
+    students = get_data_from_table('students')
+    return render_template('students.html', students=students)
+
+@app.route('/teachers')
+def view_teachers():
+    teachers = get_data_from_table('teachers')
+    return render_template('teachers.html', teachers=teachers)
+
+@app.route('/subjects')
+def view_subjects():
+    subjects = get_data_from_table('subjects')
+    return render_template('subjects.html', subjects=subjects)
+
+@app.route('/groups')
+def view_groups():
+    groups = get_data_from_table('groups')
+    return render_template('groups.html', groups=groups)
+
+@app.route('/kurses')
+def view_kurses():
+    kurses = get_data_from_table('kurses')
+    return render_template('kurses.html', kurses=kurses)
 
 if __name__ == '__main__':
     app.run(debug=True)

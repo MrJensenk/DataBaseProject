@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Таблицы БД</title>
+    <title>Главная</title>
 </head>
 <body>
-    <h1>Таблицы в базе данных</h1>
+    <h1>Добро пожаловать в систему управления базой данных</h1>
     <ul>
-        {% for table in tables %}
-            <li><a href="{{ url_for('view_table', table_name=table) }}">{{ table }}</a></li>
-        {% endfor %}
+        <li><a href="/students">Студенты</a></li>
+        <li><a href="/teachers">Преподаватели</a></li>
+        <li><a href="/subjects">Предметы</a></li>
+        <li><a href="/groups">Группы</a></li>
+        <li><a href="/kurses">Курсы</a></li>
     </ul>
 </body>
 </html>
