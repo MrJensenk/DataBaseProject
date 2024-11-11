@@ -43,5 +43,10 @@ def view_kurses():
     kurses = get_data_from_table('kurses')
     return render_template('kurses.html', kurses=kurses)
 
+@app.route('/kurators')
+def view_kurators():
+    kurators = get_data_from_table('kurators')
+    return render_template('kurators.html', kurators=kurators)
+
 if __name__ == '__main__':
     app.run(debug=True)
