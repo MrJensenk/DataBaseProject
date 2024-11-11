@@ -3,31 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Студенты</title>
+    <title>Курсы</title>
 </head>
 <body>
-    <h1>Список студентов</h1>
+    <h1>Список курсов</h1>
     <table border="1">
         <tr>
-            <th>ID</th>
-            <th>ID Кур</th>
-            <th>ID Группы</th>
-            <th>Имя</th>
-            <th>Фамилия</th>
-            <th>Возраст</th>
-            <th>Email</th>
-            <th>Паспорт</th>
+            <th>ID_kurs</th>
+            <th>ID_subject</th>
+            <th>ID_teacher</th>
+            <th>title</th>
+            <th>time</th>
+            <th>cost</th>
+            <th>dateStart</th>
         </tr>
-        {% for student in students %}
+        {% for kurs in kurses %}
         <tr>
-            <td>{{ student[0] }}</td>
-            <td>{{ student[1] }}</td>
-            <td>{{ student[2] }}</td>
-            <td>{{ student[3] }}</td>
-            <td>{{ student[4] }}</td>
-            <td>{{ student[5] }}</td>
-            <td>{{ student[6] }}</td>
-            <td>{{ student[7] }}</td>
+            <td>{{ kurs[0] }}</td>
+            <td>{{ kurs[1] }}</td>
+            <td>{{ kurs[2] }}</td>
+            <td>{{ kurs[3] }}</td>
+            <td>{{ kurs[4] }}</td>
+            <td>{{ kurs[5] }}</td>
+            <td>{{ kurs[6] }}</td>
         </tr>
         {% endfor %}
     </table>

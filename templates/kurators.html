@@ -3,31 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Студенты</title>
+    <title>Кураторы</title>
 </head>
 <body>
-    <h1>Список студентов</h1>
+    <h1>Список кураторов</h1>
     <table border="1">
         <tr>
-            <th>ID</th>
-            <th>ID Кур</th>
-            <th>ID Группы</th>
-            <th>Имя</th>
-            <th>Фамилия</th>
-            <th>Возраст</th>
+            <th>ID_kur</th>
+            <th>ID_kurs</th>
+            <th>name</th>
+            <th>surname</th>
             <th>Email</th>
-            <th>Паспорт</th>
         </tr>
-        {% for student in students %}
+        {% for kurator in kurators %}
         <tr>
-            <td>{{ student[0] }}</td>
-            <td>{{ student[1] }}</td>
-            <td>{{ student[2] }}</td>
-            <td>{{ student[3] }}</td>
-            <td>{{ student[4] }}</td>
-            <td>{{ student[5] }}</td>
-            <td>{{ student[6] }}</td>
-            <td>{{ student[7] }}</td>
+            <td>{{ kurator[0] }}</td>
+            <td>{{ kurator[1] }}</td>
+            <td>{{ kurator[2] }}</td>
+            <td>{{ kurator[3] }}</td>
+            <td>{{ kurator[4] }}</td>
         </tr>
         {% endfor %}
     </table>
