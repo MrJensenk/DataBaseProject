@@ -367,13 +367,37 @@ class Teacher(db.Model):
     name = db.Column(db.String, nullable=False)
     surname = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
+class Subject(db.Model):
+    ID_subject = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String, nullable=False)
+
+class Group(db.Model):
+    ID_group = db.Column(db.Integer, primary_key=True)
+    titleGroup = db.Column(db.String, nullable=False)
+    ID_teacher = db.Column(db.Integer, nullable=False)
+
+class Kurses(db.Model):
+    ID_kurs = db.Column(db.Integer, primary_key=True)
+    ID_subject = db.Column(db.Integer, primary_key=True)
+    ID_teacher = db.Column(db.Integer, nullable=False)
+    title = db.Column(db.String, nullable=False)
+    time = db.Column(db.Integer, nullable=False)
+    cost = db.Column(db.Integer, nullable=False)
+    dateStart = db.Column(db.String, nullable=False) 
+
+class Kurator(db.Model):
+    ID_kur = db.Column(db.Integer, primary_key=True)
+    ID_kurs = db.Column(db.Integer, nullable=False)
+    name = db.Column(db.String, nullable=False)
+    surname = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False)
 
 
 # Функция для загрузки данных из CSV
 def load_data_from_csv():
     csv_files = {
-        'students': 'table_data.csv',
-        'teachers': 'teachers_data.csv'
+        'students': 'tables/table_data.csv',
+        'teachers': 'tables/teachers_data.csv'
     }
 
     for key, file_path in csv_files.items():
