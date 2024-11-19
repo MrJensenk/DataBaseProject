@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактировать студента</title>
+</head>
+<body>
+    <h1>Редактировать студента</h1>
+    <form method="POST">
+        <label>ID Кур:</label><br>
+        <input type="text" name="ID_kur" value="{{ student[1] }}" required><br>
+        <label>ID Группы:</label><br>
+        <input type="text" name="ID_group" value="{{ student[2] }}" required><br>
+        <label>Имя:</label><br>
+        <input type="text" name="name" value="{{ student[3] }}" required><br>
+        <label>Фамилия:</label><br>
+        <input type="text" name="surname" value="{{ student[4] }}" required><br>
+        <label>Возраст:</label><br>
+        <input type="number" name="age" value="{{ student[5] }}" required><br>
+        <label>Email:</label><br>
+        <input type="email" name="email" value="{{ student[6] }}" required><br>
+        <label>Паспорт:</label><br>
+        <input type="text" name="passport" value="{{ student[7] }}" required><br>
+        <input type="submit" value="Сохранить">
+    </form>
+    <form method="POST" action="{{ url_for('delete_student', ID_student=student[0]) }}">
+        <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этого студента?');">
+    </form>
+    <a href="/students">На главную</a>
+</body>
+</html>
