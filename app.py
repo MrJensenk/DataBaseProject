@@ -338,7 +338,7 @@
 # if __name__ == '__main__':
     
 #     app.run(debug=True)
-
+from sqlalchemy import CheckConstraint, Column, Integer, String, ForeignKey
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import csv
@@ -353,51 +353,78 @@ db = SQLAlchemy(app)
 
 # Определение моделей
 class Student(db.Model):
+    __tablename__  = 'student'
+
     ID_student = db.Column(db.Integer, primary_key=True)
-    ID_kur = db.Column(db.Integer, nullable=False)
-    ID_group = db.Column(db.Integer, nullable=False)
-    name = db.Column(db.String, nullable=False)
-    surname = db.Column(db.String, nullable=False)
+    ID_kur = db.Column(db.Integer,ForeignKey('kurator.ID_kur'),nullable=False)
+    ID_group = db.Column(db.Integer, ForeignKey('group.ID_group'), nullable=False)
+    name = db.Column(db.String(60), nullable=False)
+    surname = db.Column(db.String(60), nullable=False)
     age = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String, nullable=False)
-    passport = db.Column(db.String, nullable=False)
+    passport = db.Column(db.String(6), nullable=False)
+    __table_args__ = (CheckConstraint('age >= 18', name='check_age'))
+    
+    group = db.relationship('Group', back_populates = 'student')
+    kurator = db.relationship('Kurator', back_populates='student')
+    
 class Teacher(db.Model):
+    __tablename__ = 'teacher'
+
     ID_teacher = db.Column(db.Integer, primary_key=True)
-    ID_subject = db.Column(db.Integer, nullable=False)
-    name = db.Column(db.String, nullable=False)
-    surname = db.Column(db.String, nullable=False)
+    ID_subject = db.Column(db.Integer,ForeignKey('subject.ID_subject'), nullable=False)
+    name = db.Column(db.String(60), nullable=False)
+    surname = db.Column(db.String(60), nullable=False)
     email = db.Column(db.String, nullable=False)
+
+    subject = db.relationship('Subject', back_populates='teacher')
+    group = db.relationship('Group', back_populates = 'teacher')
+
 class Subject(db.Model):
+    __tablename__ = 'subject'
     ID_subject = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
 
+    teacher = db.relationship('Teacher', back_populates='subject')
+
 class Group(db.Model):
+    __tablename__ = 'group'
     ID_group = db.Column(db.Integer, primary_key=True)
     titleGroup = db.Column(db.String, nullable=False)
-    ID_teacher = db.Column(db.Integer, nullable=False)
+    ID_teacher = db.Column(db.Integer, ForeignKey('teacher.ID_teacher'), nullable=False)
+
+    student = db.relationship('Student', back_populates='group')
+    teacher = db.relationship('Teacher', back_populates='group')
 
 class Kurses(db.Model):
+    __tablename__ = 'kurses'
     ID_kurs = db.Column(db.Integer, primary_key=True)
-    ID_subject = db.Column(db.Integer, primary_key=True)
-    ID_teacher = db.Column(db.Integer, nullable=False)
+    ID_subject = db.Column(db.Integer,  primary_key=True)
+    ID_teacher = db.Column(db.Integer,  nullable=False)
     title = db.Column(db.String, nullable=False)
     time = db.Column(db.Integer, nullable=False)
     cost = db.Column(db.Integer, nullable=False)
-    dateStart = db.Column(db.String, nullable=False) 
+    dateStart = db.Column(db.String, nullable=False)
+    __table_args__ = (CheckConstraint('time >= 1 and time <=24 ', name='check_time'),)
+    __table_args__ = (CheckConstraint('cost <= 200000', name='check_cost'),)
 
 class Kurator(db.Model):
+    __tablename__ = 'kurator'
     ID_kur = db.Column(db.Integer, primary_key=True)
     ID_kurs = db.Column(db.Integer, nullable=False)
-    name = db.Column(db.String, nullable=False)
-    surname = db.Column(db.String, nullable=False)
+    name = db.Column(db.String(60), nullable=False)
+    surname = db.Column(db.String(60), nullable=False)
     email = db.Column(db.String, nullable=False)
 
+    student = db.relationship('Student', back_populates='kurator')
 
 # Функция для загрузки данных из CSV
 def load_data_from_csv():
     csv_files = {
         'students': 'tables/table_data.csv',
-        'teachers': 'tables/teachers_data.csv'
+        'teachers': 'tables/teachers_data.csv',
+        'subjects': 'tables/subjects_data.csv',
+        'groups' : 'tables/groups_data.csv'
     }
 
     for key, file_path in csv_files.items():
@@ -410,8 +437,8 @@ def load_data_from_csv():
                 reader = csv.DictReader(file)
                 for row in reader:
                     if key == 'students':
-                        existing_student = Student.query.filter_by(ID_student=row['ID_student']).first()
-                        if existing_student is None:
+                        existing_student = Student.query.filter_by(ID_student=row['ID_student']).count()
+                        if existing_student == 0:
                             new_student = Student(
                                 ID_kur=row['ID_kur'],
                                 ID_group=row['ID_group'],
@@ -433,7 +460,21 @@ def load_data_from_csv():
                                 email=row['email']
                                 )
                             db.session.add(new_teacher)
-                          
+                    elif key == 'subjects':
+                        existing_subject = Subject.query.filter_by(ID_subject=row['ID_subject']).count()   
+                        if existing_subject == 0:
+                            new_subject = Subject(
+                                title = row['title']
+                            )
+                            db.session.add(new_subject)
+                    elif key == 'groups':
+                        existing_group = Group.query.filter_by(ID_group=row['ID_group']).count()
+                        if existing_group == 0:
+                            new_group = Group(
+                                titleGroup = row['titleGroup'],
+                                ID_teacher = row['ID_teacher']
+                            )
+                            db.session.add(new_group)
                 db.session.commit()
                 print(f"Данные из {key} успешно загружены.")
         except Exception as e:
@@ -493,7 +534,7 @@ def edit_student(ID_student):
         db.session.commit()
         return redirect(url_for('view_students'))
     
-    return render_template('upgrade_student.html', student=student)
+    return render_template('upgrade_student.html', Student=student)
 
 @app.route('/students/delete/<int:ID_student>', methods=['POST'])
 def delete_student(ID_student):
@@ -537,7 +578,7 @@ def edit_teacher(ID_teacher):
         db.session.commit()
         return redirect(url_for('view_teachers'))
     
-    return render_template('upgrade_teacher.html', teacher=teacher)
+    return render_template('upgrade_teacher.html', Teacher=teacher)
 
 @app.route('/teachers/delete/<int:ID_teacher>', methods=['POST'])
 def delete_teacher(ID_teacher):

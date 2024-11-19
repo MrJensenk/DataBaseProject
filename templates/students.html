@@ -22,19 +22,19 @@
             <th>Паспорт</th>
             <th>Действия</th>
         </tr>   
-        {% for student in students %}
+        {% for student in Student %}
         <tr>
-            <td>{{ student[0] }}</td>
-            <td>{{ student[1] }}</td>
-            <td>{{ student[2] }}</td>
-            <td>{{ student[3] }}</td>
-            <td>{{ student[4] }}</td>
-            <td>{{ student[5] }}</td>
-            <td>{{ student[6] }}</td>
-            <td>{{ student[7] }}</td>
+            <td>{{ student.ID_student }}</td>
+            <td>{{ student.ID_kur }}</td>
+            <td>{{ student.ID_group }}</td>
+            <td>{{ student.name }}</td>
+            <td>{{ student.surname }}</td>
+            <td>{{ student.age }}</td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.passport }}</td>
             <td>
-                <a href="{{ url_for('edit_student', ID_student=student[0]) }}">Редактировать</a>
-                <form method="POST" action="{{ url_for('delete_student', ID_student=student[0]) }}" style="display:inline;">
+                <a href="{{ url_for('edit_student', ID_student=student.ID_student) }}">Редактировать</a>
+                <form method="POST" action="{{ url_for('delete_student', ID_student=student.ID_student) }}" style="display:inline;">
                     <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этого студента?');">
                 </form>
             </td>

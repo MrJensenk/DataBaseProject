@@ -19,16 +19,16 @@
             <th>Email</th>
             <th>Действия</th>
         </tr>
-        {% for teacher in teachers %}
+        {% for teacher in Teacher %}
         <tr>
-            <td>{{ teacher[0] }}</td>
-            <td>{{ teacher[1] }}</td>
-            <td>{{ teacher[2] }}</td>
-            <td>{{ teacher[3] }}</td>
-            <td>{{ teacher[4] }}</td>
+            <td>{{ teacher.ID_teacher }}</td>
+            <td>{{ teacher.ID_subject }}</td>
+            <td>{{ teacher.name }}</td>
+            <td>{{ teacher.surname}}</td>
+            <td>{{ teacher.email }}</td>
             <td>
-                <a href="{{ url_for('edit_teacher', ID_teacher=teacher[0]) }}">Редактировать</a>
-                <form method="POST" action="{{ url_for('delete_teacher', ID_teacher=teacher[0]) }}" style="display:inline;">
+                <a href="{{ url_for('edit_teacher', ID_teacher=teacher.ID_teacher) }}">Редактировать</a>
+                <form method="POST" action="{{ url_for('delete_teacher', ID_teacher=teacher.ID_teacher) }}" style="display:inline;">
                     <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этого преподавателя?');">
                 </form>
             </td>
