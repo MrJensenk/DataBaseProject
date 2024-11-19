@@ -9,6 +9,8 @@
 </head>
 <body>
     <h1>Список курсов</h1>
+    <a href="kurses/add">Добавить курс</a>
+    <a href="/">На главную</a>
     <table border="1">
         <tr>
             <th>ID_kurs</th>
@@ -18,19 +20,27 @@
             <th>time</th>
             <th>cost</th>
             <th>dateStart</th>
+            <th>Действия</th>
         </tr>
-        {% for kurs in kurses %}
+        {% for kurs in Kurses %}
         <tr>
-            <td>{{ kurs[0] }}</td>
-            <td>{{ kurs[1] }}</td>
-            <td>{{ kurs[2] }}</td>
-            <td>{{ kurs[3] }}</td>
-            <td>{{ kurs[4] }}</td>
-            <td>{{ kurs[5] }}</td>
-            <td>{{ kurs[6] }}</td>
+            <td>{{ kurs.ID_kurs }}</td>
+            <td>{{ kurs.ID_subject }}</td>
+            <td>{{ kurs.ID_teacher }}</td>
+            <td>{{ kurs.title}}</td>
+            <td>{{ kurs.time}}</td>
+            <td>{{ kurs.cost}}</td>
+            <td>{{ kurs.dateStart}}</td>
+            <td>
+                <a href="{{ url_for('edit_kur', ID_kurs=kurs.ID_kurs) }}">Редактировать</a>
+                <form method="POST" action="{{ url_for('delete_kur', ID_kurs=kurs.ID_kurs) }}" style="display:inline;">
+                    <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этот курс?');">
+                </form>
+            </td>
+
         </tr>
         {% endfor %}
     </table>
-    <a href="/">На главную</a>
+    
 </body>
 </html>

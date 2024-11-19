@@ -11,16 +11,16 @@
     <h1>Редактировать студента</h1>
     <form method="POST">
         <label>ID предмета:</label><br>
-        <input type="text" name="ID_subject" value="{{ teacher[1] }}" required><br>
+        <input type="text" name="ID_subject" value="{{ Teacher.ID_subject }}" required><br>
         <label>Имя:</label><br>
-        <input type="text" name="name" value="{{ teacher[2] }}" required><br>
+        <input type="text" name="name" value="{{ Teacher.name }}" required><br>
         <label>Фамилия:</label><br>
-        <input type="text" name="surname" value="{{ teacher[3] }}" required><br>
+        <input type="text" name="surname" value="{{ Teacher.surname }}" required><br>
         <label>Email:</label><br>
-        <input type="email" name="email" value="{{ student[4] }}" required><br>
+        <input type="email" name="email" value="{{ Teacher.email }}" required><br>
         <input type="submit" value="Сохранить">
     </form>
-    <form method="POST" action="{{ url_for('delete_teacher', ID_teacher=teacher[0]) }}">
+    <form method="POST" action="{{ url_for('delete_teacher', ID_teacher=Teacher.ID_teacher) }}">
         <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этого преподавателя?');">
     </form>
     <a href="/teachers">На главную</a>

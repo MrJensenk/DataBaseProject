@@ -9,24 +9,32 @@
 </head>
 <body>
     <h1>Список кураторов</h1>
+    <a href="kurators/add">Добавить куратора</a>
+    <a href="/">На главную</a>
     <table border="1">
         <tr>
             <th>ID_kur</th>
             <th>ID_kurs</th>
             <th>name</th>
             <th>surname</th>
-            <th>Email</th>
+            <th>email</th>
         </tr>
-        {% for kurator in kurators %}
+        {% for kurator in Kurator %}
         <tr>
-            <td>{{ kurator[0] }}</td>
-            <td>{{ kurator[1] }}</td>
-            <td>{{ kurator[2] }}</td>
-            <td>{{ kurator[3] }}</td>
-            <td>{{ kurator[4] }}</td>
+            <td>{{ kurator.ID_kur}}</td>
+            <td>{{ kurator.ID_kurs }}</td>
+            <td>{{ kurator.name}}</td>
+            <td>{{ kurator.surname}}</td>
+            <td>{{ kurator.email}}</td>
+            <td>
+                <a href="{{ url_for('edit_kurator', ID_kur=kurator.ID_kur) }}">Редактировать</a>
+                <form method="POST" action="{{ url_for('delete_kurator', ID_kur=kurator.ID_kur) }}" style="display:inline;">
+                    <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этого куратора?');">
+                </form>
+            </td>
         </tr>
         {% endfor %}
     </table>
-    <a href="/">На главную</a>
+    
 </body>
 </html>

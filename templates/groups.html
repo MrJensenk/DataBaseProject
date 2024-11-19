@@ -8,21 +8,30 @@
 
 </head>
 <body>
-    <h1>Список группы</h1>
+    <h1>Список групп</h1>
+    <a href="/groups/add">Добавить группу</a>
+    <a href="/">На главную</a>
     <table border="1">
         <tr>
             <th>ID_group</th>
             <th>titleGroup</th>
             <th>ID_teacher</th>
+            <th>Действия</th>
         </tr>
-        {% for group in groups %}
+        {% for group in Group %}
         <tr>
-            <td>{{ group[0] }}</td>
-            <td>{{ group[1] }}</td>
-            <td>{{ group[2] }}</td>
+            <td>{{ group.ID_group }}</td>
+            <td>{{ group.titleGroup }}</td>
+            <td>{{ group.ID_teacher }}</td>
+            <td>
+                <a href="{{ url_for('edit_group', ID_group=group.ID_group) }}">Редактировать</a>
+                <form method="POST" action="{{ url_for('delete_group', ID_group=group.ID_group) }}" style="display:inline;">
+                    <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить эту группу?');">
+                </form>
+            </td>
         </tr>
         {% endfor %}
     </table>
-    <a href="/">На главную</a>
+   
 </body>
 </html>

@@ -9,19 +9,28 @@
 </head>
 <body>
     <h1>Список предметов</h1>
+    <a href="subjects/add">Добавить предмет</a>
+    <a href="/">На главную</a>
     <table border="1">
         <tr>
             <th>ID_subjects</th>
             <th>title</th>
+            <th>Действия</th>
             
         </tr>
-        {% for subject in subjects %}
+        {% for subject in Subject %}
         <tr>
-            <td>{{ subject[0] }}</td>
-            <td>{{ subject[1] }}</td>
+            <td>{{ subject.ID_subject }}</td>
+            <td>{{ subject.title}}</td>
+            <td>
+                <a href="{{ url_for('edit_subject', ID_subject=subject.ID_subject) }}">Редактировать</a>
+                <form method="POST" action="{{ url_for('delete_subject', ID_subject=subject.ID_subject) }}" style="display:inline;">
+                    <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этот предмет?');">
+                </form>
+            </td>
         </tr>
         {% endfor %}
     </table>
-    <a href="/">На главную</a>
+    
 </body>
 </html>

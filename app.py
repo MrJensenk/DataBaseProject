@@ -363,7 +363,7 @@ class Student(db.Model):
     age = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String, nullable=False)
     passport = db.Column(db.String(6), nullable=False)
-    __table_args__ = (CheckConstraint('age >= 18', name='check_age'))
+    __table_args__ = (CheckConstraint('age >= 18', name='check_age'),)
     
     group = db.relationship('Group', back_populates = 'student')
     kurator = db.relationship('Kurator', back_populates='student')
@@ -440,6 +440,7 @@ def load_data_from_csv():
                         existing_student = Student.query.filter_by(ID_student=row['ID_student']).count()
                         if existing_student == 0:
                             new_student = Student(
+                                ID_student = row['ID_student'],
                                 ID_kur=row['ID_kur'],
                                 ID_group=row['ID_group'],
                                 name=row['name'],
@@ -454,6 +455,7 @@ def load_data_from_csv():
                         existing_teacher = Teacher.query.filter_by(ID_teacher=row['ID_teacher']).count()
                         if existing_teacher == 0 :
                             new_teacher = Teacher(
+                                ID_teacher = row['ID_teacher'],
                                 ID_subject=row['ID_subject'],
                                 name=row['name'],
                                 surname=row['surname'],
@@ -464,16 +466,18 @@ def load_data_from_csv():
                         existing_subject = Subject.query.filter_by(ID_subject=row['ID_subject']).count()   
                         if existing_subject == 0:
                             new_subject = Subject(
+                                ID_subject = row['ID_subject'],
                                 title = row['title']
-                            )
+                                )
                             db.session.add(new_subject)
                     elif key == 'groups':
                         existing_group = Group.query.filter_by(ID_group=row['ID_group']).count()
                         if existing_group == 0:
                             new_group = Group(
+                                ID_group = row['ID_group'],
                                 titleGroup = row['titleGroup'],
                                 ID_teacher = row['ID_teacher']
-                            )
+                                )
                             db.session.add(new_group)
                 db.session.commit()
                 print(f"Данные из {key} успешно загружены.")
@@ -587,6 +591,179 @@ def delete_teacher(ID_teacher):
     db.session.commit()
     
     return redirect(url_for('view_teachers'))
+
+@app.route('/subjects')
+def view_subjects():
+    subjects = get_data_from_table(Subject)
+    return render_template('subjects.html', Subject=subjects)
+
+@app.route('/subjects/add', methods=['GET', 'POST'])
+def add_subject():
+    if request.method == 'POST':
+        title = request.form['title']
+        
+        new_subject = Subject(title=title)
+        db.session.add(new_subject)
+        db.session.commit()
+        
+        return redirect(url_for('view_subjects'))
+    
+    return render_template('add_subject.html')
+
+@app.route('/subjects/edit/<int:ID_subject>', methods=['GET', 'POST'])
+def edit_subject(ID_subject):
+    subject = Subject.query.get_or_404(ID_subject)
+    
+    if request.method == 'POST':
+        subject.title = request.form['title']
+
+        db.session.commit()
+        return redirect(url_for('view_subjects'))
+    
+    return render_template('upgrade_subject.html', Subject=subject)
+
+@app.route('/subjects/delete/<int:ID_subject>', methods=['POST'])
+def delete_subject(ID_subject):
+    subject = Subject.query.get_or_404(ID_subject)
+    db.session.delete(subject)
+    db.session.commit()
+    
+    return redirect(url_for('view_subjects'))
+
+@app.route('/groups')
+def view_groups():
+    groups = get_data_from_table(Group)
+    return render_template('groups.html', Group=groups)
+
+@app.route('/groups/add', methods=['GET', 'POST'])
+def add_group():
+    if request.method == 'POST':
+        title = request.form['title']
+        ID_teacher = request.form['ID_teacher']
+
+        
+        new_group = Group(title=title, ID_teacher = ID_teacher)
+        db.session.add(new_group)
+        db.session.commit()
+        
+        return redirect(url_for('view_groups'))
+    
+    return render_template('add_group.html')
+
+@app.route('/groups/edit/<int:ID_group>', methods=['GET', 'POST'])
+def edit_group(ID_group):
+    group = Group.query.get_or_404(ID_group)
+    
+    if request.method == 'POST':
+        group.title = request.form['title']
+        group.ID_teacher = request.form['ID_teacher']
+
+        db.session.commit()
+        return redirect(url_for('view_groups'))
+    
+    return render_template('upgrade_group.html', Group=group)
+
+@app.route('/groups/delete/<int:ID_group>', methods=['POST'])
+def delete_group(ID_group):
+    group = Group.query.get_or_404(ID_group)
+    db.session.delete(group)
+    db.session.commit()
+    
+    return redirect(url_for('view_groups'))
+
+
+@app.route('/kurses')
+def view_kurses():
+    kurses = get_data_from_table(Kurses)
+    return render_template('kurses.html', Kurses=kurses)
+
+@app.route('/kurses/add', methods=['GET', 'POST'])
+def add_kur():
+    if request.method == 'POST':
+        ID_subject = request.form['ID_subject']
+        ID_teacher = request.form['ID_teacher']
+        title = request.form['title']
+        time = request.form['time']
+        cost = request.form['cost']
+        dateStart = request.form['dateStart'] 
+
+        
+        new_kur = Kurses(ID_subject=ID_subject, ID_teacher=ID_teacher, title=title, time=time, cost=cost, dateStart=dateStart)
+        db.session.add(new_kur)
+        db.session.commit()
+        
+        return redirect(url_for('view_kurses'))
+    
+    return render_template('add_kur.html')
+
+@app.route('/kurses/edit/<int:ID_kurs>', methods=['GET', 'POST'])
+def edit_kur(ID_kurs):
+    kur = Kurses.query.get_or_404(ID_kurs)
+    
+    if request.method == 'POST':
+        kur.ID_subject = request.form['ID_subject']
+        kur.ID_teacher = request.form['ID_teacher']
+        kur.title = request.form['title']
+        kur.time = request.form['time']
+        kur.cost = request.form['cost']
+        kur.dateStart = request.form['dateStart'] 
+
+        db.session.commit()
+        return redirect(url_for('view_kurses'))
+    
+    return render_template('upgrade_kur.html', Kurses=kur)
+
+@app.route('/kurses/delete/<int:ID_kurs>', methods=['POST'])
+def delete_kur(ID_kurs):
+    kur = Kurses.query.get_or_404(ID_kurs)
+    db.session.delete(kur)
+    db.session.commit()
+    
+    return redirect(url_for('view_kurses'))
+
+@app.route('/kurators')
+def view_kurators():
+    kurators = get_data_from_table(Kurator)
+    return render_template('kurators.html', Kurator=kurators)
+
+@app.route('/kurators/add', methods=['GET', 'POST'])
+def add_kurator():
+    if request.method == 'POST':
+        ID_kur = request.form['ID_kur']
+        name = request.form['name']
+        surname = request.form['surname']
+        email = request.form['email']
+        
+        new_kurator = Kurator(ID_kur=ID_kur, name=name, surname=surname, email=email)
+        db.session.add(new_kurator)
+        db.session.commit()
+        
+        return redirect(url_for('view_kurators'))
+    
+    return render_template('add_kurator.html')
+
+@app.route('/kurators/edit/<int:ID_kur>', methods=['GET', 'POST'])
+def edit_kurator(ID_kur):
+    kurator = Kurator.query.get_or_404(ID_kur)
+    
+    if request.method == 'POST':
+        kurator.ID_kur = request.form['ID_kur']
+        kurator.name = request.form['name']
+        kurator.surname = request.form['surname']
+        kurator.email = request.form['email']
+
+        db.session.commit()
+        return redirect(url_for('view_kurators'))
+    
+    return render_template('upgrade_kurator.html', Kurator=kurator)
+
+@app.route('/kurators/delete/<int:ID_kur>', methods=['POST'])
+def delete_kurator(ID_kur):
+    kurator = Kurator.query.get_or_404(ID_kur)
+    db.session.delete(kurator)
+    db.session.commit()
+    
+    return redirect(url_for('view_kurators'))
 
 if __name__ == '__main__':
     app.run(debug=True)
