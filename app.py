@@ -156,11 +156,25 @@ def get_data_from_table(model):
 def index():
     return render_template('index.html')
 
-@app.route('/students')
+@app.route('/students', methods=['GET', 'POST'])
 def view_students():
-    students = get_data_from_table(Student)
-    return render_template('students.html', Student=students)
+    name = request.args.get('name', '')
+    surname = request.args.get('surname', '')
+    age = request.args.get('age', '')
+    page = request.args.get('page', 1, type=int)
 
+    query = Student.query
+
+    if name:
+        query = query.filter(Student.name.ilike(f'%{name}%'))
+    if surname:
+        query = query.filter(Student.surname.ilike(f'%{surname}%'))
+    if age:
+        query = query.filter(Student.age == age)
+
+    students = query.paginate(page=page, per_page=25)
+
+    return render_template('students.html', students=students, name=name, surname=surname, age=age)
 
 
 @app.route('/students/add', methods=['GET', 'POST'])
