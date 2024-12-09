@@ -9,29 +9,50 @@
 </head>
 <body>
     <h1>Список групп</h1>
-    <a href="/groups/add">Добавить группу</a>
-    <a href="/">На главную</a>
-    <table border="1">
+    <a href="/groups/add" class="btn btn-primary">Добавить группу</a>
+    <a href="/" class="btn btn-secondary">На главную</a>
+    <form method="GET" action="{{ url_for('view_groups') }}" class="mt-3 mb-3">
+        <div class="row">
+            <div class="col">
+                <input type="text" name="titleGroupclass="form-control" placeholder="Название группы" value="{{ titleGroup}}">
+            </div>
+            <div class="col">
+                <input type="number" name="ID_teacher" class="form-control" placeholder="ID преподавателя" value="{{ ID_teacher}}">
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-success">Поиск</button>
+            </div>
+        </div>
+    </form>
+    <table class="table table-bordered">
         <tr>
             <th>ID_group</th>
             <th>titleGroup</th>
             <th>ID_teacher</th>
             <th>Действия</th>
         </tr>
-        {% for group in Group %}
+        {% for group in groups.items %}
         <tr>
             <td>{{ group.ID_group }}</td>
             <td>{{ group.titleGroup }}</td>
             <td>{{ group.ID_teacher }}</td>
             <td>
-                <a href="{{ url_for('edit_group', ID_group=group.ID_group) }}">Редактировать</a>
+                <a href="{{ url_for('edit_group', ID_group=group.ID_group) }}" class="btn btn-warning">Редактировать</a>
                 <form method="POST" action="{{ url_for('delete_group', ID_group=group.ID_group) }}" style="display:inline;">
-                    <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить эту группу?');">
+                    <input type="submit" value="Удалить" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить эту группу?');">
                 </form>
             </td>
         </tr>
         {% endfor %}
     </table>
-   
+    <div class="pagination">
+        {% if groups.has_prev %}
+            <a href="{{ url_for('view_groups', page=groups.prev_num, titleGroup=titleGroup, ID_tracher=ID_teacher) }}" class="btn btn-primary">Предыдущая</a>
+        {% endif %}
+        <span>Страница {{ groups.page }} из {{ groups.pages }}</span>
+        {% if groups.has_next %}
+            <a href="{{ url_for('view_groups', page=groups.next_num, titleGroup=titleGroup, ID_teacher=ID_teacher) }}" class="btn btn-primary">Следующая</a>
+        {% endif %}
+    </div>
 </body>
 </html>

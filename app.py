@@ -1,83 +1,9 @@
 from sqlalchemy import CheckConstraint, Column, Integer, String, ForeignKey
-from flask import Flask, render_template, request, redirect, url_for,jsonify
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import csv
 import os
-
-app = Flask(__name__)
-
-# Настройка базы данных
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///databaseVSU.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-
-# Определение моделей
-class Student(db.Model):
-    __tablename__  = 'student'
-
-    ID_student = db.Column(db.Integer, primary_key=True, autoincrement = True)
-    ID_kur = db.Column(db.Integer, db.ForeignKey('kurator.ID_kur'),nullable=False)
-    ID_group = db.Column(db.Integer, db.ForeignKey('group.ID_group'),nullable=False)
-    name = db.Column(db.String(60), nullable=False)
-    surname = db.Column(db.String(60), nullable=False)
-    age = db.Column(db.Integer, nullable=False)
-    email = db.Column(db.String, nullable=False)
-    passport = db.Column(db.String(6), nullable=False)
-    __table_args__ = (CheckConstraint('age >= 18', name='check_age'),)
-    
-    
-class Teacher(db.Model):
-    __tablename__ = 'teacher'
-
-    ID_teacher = db.Column(db.Integer, primary_key=True, autoincrement = True)
-    ID_subject = db.Column(db.Integer,  db.ForeignKey('subject.ID_subject'),nullable=False)
-    name = db.Column(db.String(60), nullable=False)
-    surname = db.Column(db.String(60), nullable=False)
-    email = db.Column(db.String, nullable=False)
-
-    group = db.relationship('Group', backref = 'teacher',lazy=True)
-    kurses = db.relationship('Kurses', backref='teacher', lazy=True)
-
-class Subject(db.Model):
-    __tablename__ = 'subject'
-    ID_subject = db.Column(db.Integer, primary_key=True, autoincrement = True)
-    title = db.Column(db.String, nullable=False)
-
-    teacher = db.relationship('Teacher', backref='subject', lazy = True)
-    kurses = db.relationship('Kurses', backref = 'subject',lazy = True)
-
-
-class Group(db.Model):
-    __tablename__ = 'group'
-    ID_group = db.Column(db.Integer, primary_key=True, autoincrement = True)
-    titleGroup = db.Column(db.String, nullable=False)
-    ID_teacher = db.Column(db.Integer, db.ForeignKey('teacher.ID_teacher'), nullable=False)
-
-    student = db.relationship('Student', backref='group',lazy = True)
-
-class Kurses(db.Model):
-    __tablename__ = 'kurses'
-    ID_kurs = db.Column(db.Integer, primary_key=True, autoincrement = True)
-    ID_subject = db.Column(db.Integer,  db.ForeignKey('subject.ID_subject'), nullable = False)
-    ID_teacher = db.Column(db.Integer,  db.ForeignKey('teacher.ID_teacher'),nullable=False)
-    title = db.Column(db.String, nullable=False)
-    time = db.Column(db.Integer, nullable=False)
-    cost = db.Column(db.Integer, nullable=False)
-    dateStart = db.Column(db.String, nullable=False)
-    __table_args__ = (CheckConstraint('time >= 1 and time <=24 ', name='check_time'),)
-    __table_args__ = (CheckConstraint('cost <= 200000', name='check_cost'),)
-
-    kurators = db.relationship('Kurator', backref = 'kurses', lazy = True)
-class Kurator(db.Model):
-    __tablename__ = 'kurator'
-    ID_kur = db.Column(db.Integer, primary_key=True, autoincrement = True)
-    ID_kurs = db.Column(db.Integer,  db.ForeignKey('kurses.ID_kurs'),nullable=False)
-    name = db.Column(db.String(60), nullable=False)
-    surname = db.Column(db.String(60), nullable=False)
-    email = db.Column(db.String, nullable=False)
-
-    student =db.relationship('Student', backref='kurator',lazy = True)
-
+from models import *
     
 # Функция для загрузки данных из CSV
 def load_data_from_csv():
@@ -322,7 +248,7 @@ def view_subjects():
 @app.route('/subjects/add', methods=['GET', 'POST'])
 def add_subject():
     if request.method == 'POST':
-        title = request.form['title']
+        title = request.form.get('title')
         
         new_subject = Subject(title=title)
         db.session.add(new_subject)
@@ -337,7 +263,7 @@ def edit_subject(ID_subject):
     subject = Subject.query.get_or_404(ID_subject)
     
     if request.method == 'POST':
-        subject.title = request.form['title']
+        subject.title = request.form.get('title')
 
         db.session.commit()
         return redirect(url_for('view_subjects'))
@@ -372,8 +298,11 @@ def view_groups():
 @app.route('/groups/add', methods=['GET', 'POST'])
 def add_group():
     if request.method == 'POST':
-        title = request.form['titleGroup']
-        ID_teacher = request.form['ID_teacher']
+        title = request.form.get('titleGroup')
+        ID_teacher = request.form.get('ID_teacher')
+        id = Group.query.get(ID_teacher)
+        if id is None:
+            return "Преподаватель не найден", 404
 
         
         new_group = Group(title=title, ID_teacher = ID_teacher)
@@ -389,8 +318,12 @@ def edit_group(ID_group):
     group = Group.query.get_or_404(ID_group)
     
     if request.method == 'POST':
-        group.title = request.form['title']
-        group.ID_teacher = request.form['ID_teacher']
+        group.title = request.form.get('title')
+        group.ID_teacher = request.form.get('ID_teacher')
+
+        id = Group.query.get(group.ID_teacher)
+        if id is None:
+            return "Преподаватель не найден", 404
 
         db.session.commit()
         return redirect(url_for('view_groups'))
@@ -406,23 +339,46 @@ def delete_group(ID_group):
     return redirect(url_for('view_groups'))
 
 
-@app.route('/kurses')
+@app.route('/kurses',methods=['GET', 'POST'])
 def view_kurses():
-    kurses = get_data_from_table(Kurses)
-    return render_template('kurses.html', Kurses=kurses)
+    ID_subject = request.args.get('ID_subject', '')
+    ID_teacher = request.args.get('ID_teacher', '')
+    dateStart = request.args.get('dateStart', '')
+    page = request.args.get('page', 1, type=int)
+
+    query =Kurses.query
+
+    if ID_subject:
+        query = query.filter(Kurses.ID_subject == ID_subject)
+    if ID_teacher:
+        query = query.filter(Kurses.ID_teacher == ID_teacher)
+    if dateStart:
+        query = query.filter(Kurses.dateStart == dateStart)
+
+    kurses = query.paginate(page=page, per_page=10)
+
+    return render_template('kurses.html', kurses=kurses, ID_subject=ID_subject, ID_teacher=ID_teacher, dateStart=dateStart)
 
 @app.route('/kurses/add', methods=['GET', 'POST'])
 def add_kur():
     if request.method == 'POST':
-        ID_subject = request.form['ID_subject']
-        ID_teacher = request.form['ID_teacher']
-        title = request.form['title']
-        time = request.form['time']
-        cost = request.form['cost']
-        dateStart = request.form['dateStart'] 
+        ID_subject = request.form.get('ID_subject')
+        ID_teacher = request.form.get('ID_teacher')
+        title = request.form.get('title')
+        time = request.form.get('time')
+        cost = request.form.get('cost')
+        dateStart = request.form.get('dateStart')
+
+        id_sub = Subject.query.get(ID_subject)
+        id_teach = Teacher.query.get(ID_teacher)
+        
+        if id_sub is None:
+            return "Предмет не найден", 404
+        elif id_teach is None:
+            return "Преподаватель не найден", 404
 
         
-        new_kur = Kurses(ID_subject=ID_subject, ID_teacher=ID_teacher, title=title, time=time, cost=cost, dateStart=dateStart)
+        new_kur = Kurses(ID_subject=int(ID_subject), ID_teacher=int(ID_teacher), title=title, time=time, cost=int(cost), dateStart=dateStart)
         db.session.add(new_kur)
         db.session.commit()
         
@@ -435,12 +391,20 @@ def edit_kur(ID_kurs):
     kur = Kurses.query.get_or_404(ID_kurs)
     
     if request.method == 'POST':
-        kur.ID_subject = request.form['ID_subject']
-        kur.ID_teacher = request.form['ID_teacher']
-        kur.title = request.form['title']
-        kur.time = request.form['time']
-        kur.cost = request.form['cost']
-        kur.dateStart = request.form['dateStart'] 
+        kur.ID_subject = request.form.get('ID_subject')
+        kur.ID_teacher = request.form.get('ID_teacher')
+        kur.title = request.form.get('title')
+        kur.time = request.form.get('time')
+        kur.cost = request.form.get('cost')
+        kur.dateStart = request.form.get('dateStart')
+
+        id_sub = Subject.query.get(kur.ID_subject)
+        id_teach = Teacher.query.get(kur.ID_teacher)
+
+        if id_sub is None:
+            return "Предмет не найден", 404
+        elif id_teach is None:
+            return "Преподаватель не найден", 404
 
         db.session.commit()
         return redirect(url_for('view_kurses'))
@@ -455,20 +419,39 @@ def delete_kur(ID_kurs):
     
     return redirect(url_for('view_kurses'))
 
-@app.route('/kurators')
+@app.route('/kurators', methods = ['GET', 'POST'])
 def view_kurators():
-    kurators = get_data_from_table(Kurator)
-    return render_template('kurators.html', Kurator=kurators)
+    ID_kurs = request.args.get('ID_kurs', '')
+    name = request.args.get('name', '')
+    surname = request.args.get('surname', '')
+    page = request.args.get('page', 1, type=int)
+
+    query = Kurator.query
+
+    if ID_kurs:
+        query = query.filter(Kurator.ID_kurs == ID_kurs)
+    if name:
+        query = query.filter(Kurator.name.ilike(f'%{name}%'))
+    if surname:
+        query = query.filter(Kurator.surname.ilike(f'%{surname}%'))
+
+    kurators = query.paginate(page=page, per_page=10)
+
+    return render_template('kurators.html', kurators=kurators, ID_kurs=ID_kurs, name=name, surname=surname)
 
 @app.route('/kurators/add', methods=['GET', 'POST'])
 def add_kurator():
     if request.method == 'POST':
-        ID_kur = request.form['ID_kur']
-        name = request.form['name']
-        surname = request.form['surname']
-        email = request.form['email']
+        ID_kurs = request.form.get('ID_kurs')
+        name = request.form.get('name')
+        surname = request.form.get('surname')
+        email = request.form.get('email')
+
+        id_kurs = Kurses.query.get(ID_kurs)
+        if id_kurs is None:
+            return "Курс не найден", 404
         
-        new_kurator = Kurator(ID_kur=ID_kur, name=name, surname=surname, email=email)
+        new_kurator = Kurator(ID_kurs=int(ID_kurs), name=name, surname=surname, email=email)
         db.session.add(new_kurator)
         db.session.commit()
         
@@ -481,10 +464,14 @@ def edit_kurator(ID_kur):
     kurator = Kurator.query.get_or_404(ID_kur)
     
     if request.method == 'POST':
-        kurator.ID_kur = request.form['ID_kur']
-        kurator.name = request.form['name']
-        kurator.surname = request.form['surname']
-        kurator.email = request.form['email']
+        kurator.ID_kurs = request.form.get('ID_kurs')
+        kurator.name = request.form.get('name')
+        kurator.surname = request.form.get('surname')
+        kurator.email = request.form.get('email')
+
+        id_kurs = Kurses.query.get(kurator.ID_kurs)
+        if id_kurs is None:
+            return 'Курс не найден', 404
 
         db.session.commit()
         return redirect(url_for('view_kurators'))

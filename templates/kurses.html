@@ -9,9 +9,25 @@
 </head>
 <body>
     <h1>Список курсов</h1>
-    <a href="kurses/add">Добавить курс</a>
-    <a href="/">На главную</a>
-    <table border="1">
+    <a href="kurses/add" class="btn btn-primary">Добавить курс</a>
+    <a href="/" class="btn btn-secondary">На главную</a>
+    <form method="GET" action="{{ url_for('view_kurses') }}" class="mt-3 mb-3">
+        <div class="row">
+            <div class="col">
+                <input type="number" name="id_subject" class="form-control" placeholder="ID_предмета" value="{{ ID_subject }}">
+            </div>
+            <div class="col">
+                <input type="number" name="id_teacher" class="form-control" placeholder="ID_преподавателя" value="{{ ID_teacher }}">
+            </div>
+            <div class="col">
+                <input type="date" name="dateStart" class="form-control" placeholder="Дата начала курса" value="{{ dateStart }}">
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-success">Поиск</button>
+            </div>
+        </div>
+    </form>
+    <table class="table table-bordered">
         <tr>
             <th>ID_kurs</th>
             <th>ID_subject</th>
@@ -22,7 +38,7 @@
             <th>dateStart</th>
             <th>Действия</th>
         </tr>
-        {% for kurs in Kurses %}
+        {% for kurs in kurses.items %}
         <tr>
             <td>{{ kurs.ID_kurs }}</td>
             <td>{{ kurs.ID_subject }}</td>
@@ -32,15 +48,23 @@
             <td>{{ kurs.cost}}</td>
             <td>{{ kurs.dateStart}}</td>
             <td>
-                <a href="{{ url_for('edit_kur', ID_kurs=kurs.ID_kurs) }}">Редактировать</a>
+                <a href="{{ url_for('edit_kur', ID_kurs=kurs.ID_kurs) }}" class="btn btn-warning">Редактировать</a>
                 <form method="POST" action="{{ url_for('delete_kur', ID_kurs=kurs.ID_kurs) }}" style="display:inline;">
-                    <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этот курс?');">
+                    <input type="submit" value="Удалить" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этот курс?');">
                 </form>
             </td>
 
         </tr>
         {% endfor %}
     </table>
-    
+    <div class="pagination">
+        {% if kurses.has_prev %}
+            <a href="{{ url_for('view_kurses', page=kurses.prev_num, ID_subject=ID_subject, ID_teacher=ID_teacher, dateStart=dateStart) }}" class="btn btn-primary">Предыдущая</a>
+        {% endif %}
+        <span>Страница {{ kurses.page }} из {{ kurses.pages }}</span>
+        {% if kurses.has_next %}
+            <a href="{{ url_for('view_kurses', page=kurses.next_num, ID_subject=ID_subject, ID_teacher=ID_teacher, dateStart=dateStart) }}" class="btn btn-primary">Следующая</a>
+        {% endif %}
+    </div>
 </body>
 </html>
