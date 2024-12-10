@@ -11,7 +11,8 @@ def load_data_from_csv():
         'students': 'tables/table_data.csv',
         'teachers': 'tables/teachers_data.csv',
         'subjects': 'tables/subjects_data.csv',
-        'groups' : 'tables/groups_data.csv'
+        'groups' : 'tables/groups_data.csv',
+        'kurses': 'tables/kurses_data.csv'
     }
 
     for key, file_path in csv_files.items():
@@ -66,18 +67,28 @@ def load_data_from_csv():
                                 ID_teacher = row['ID_teacher']
                                 )
                             db.session.add(new_group)
+                    elif key == 'kurses':
+                        existing_kurses = Kurses.query.filter_by(ID_kurs=row['ID_kurs']).count()
+                        if existing_kurses == 0:
+                            new_kurs = Kurses(
+                                ID_kurs = row['ID_kurs'],
+                                ID_subject = row['ID_subject'],
+                                ID_teacher = row['ID_teacher'],
+                                title = row['title'],
+                                time = row['time'],
+                                cost = row['cost'],
+                                dateStart = row['dateStart']
+                            )
+                            db.session.add(new_kurs)
                 db.session.commit()
                 print(f"Данные из {key} успешно загружены.")
         except Exception as e:
             print(f"Ошибка при загрузке данных из {file_path}: {e}")
 
-# Создаем базу данных и загружаем данные из CSV  
+ 
 with app.app_context():
     db.create_all()  
     load_data_from_csv()
-
-def get_data_from_table(model):
-    return model.query.all()
 
 @app.route('/')
 def index():
