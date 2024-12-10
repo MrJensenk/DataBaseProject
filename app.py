@@ -12,7 +12,8 @@ def load_data_from_csv():
         'teachers': 'tables/teachers_data.csv',
         'subjects': 'tables/subjects_data.csv',
         'groups' : 'tables/groups_data.csv',
-        'kurses': 'tables/kurses_data.csv'
+        'kurses': 'tables/kurses_data.csv',
+        'kurators': 'tables/kurators_data.csv'
     }
 
     for key, file_path in csv_files.items():
@@ -80,6 +81,17 @@ def load_data_from_csv():
                                 dateStart = row['dateStart']
                             )
                             db.session.add(new_kurs)
+                    elif key == 'kurators':
+                        existing_kurators = Kurator.query.filter_by(ID_kur = row['ID_kur']).count()
+                        if existing_kurators == 0:
+                            new_kurator = Kurator(
+                                ID_kur = row['ID_kur'],
+                                ID_kurs = row['ID_kurs'],
+                                name = row['name'],
+                                surname = row['surname'],
+                                email = row['email']
+                            )
+                            db.session.add(new_kurator)
                 db.session.commit()
                 print(f"Данные из {key} успешно загружены.")
         except Exception as e:
@@ -357,7 +369,7 @@ def view_kurses():
     dateStart = request.args.get('dateStart', '')
     page = request.args.get('page', 1, type=int)
 
-    query =Kurses.query
+    query = Kurses.query
 
     if ID_subject:
         query = query.filter(Kurses.ID_subject == ID_subject)

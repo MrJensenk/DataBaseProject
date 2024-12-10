@@ -18,7 +18,6 @@ class Student(db.Model):
     age = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String, nullable=False)
     passport = db.Column(db.String(6), nullable=False)
-    __table_args__ = (CheckConstraint('age >= 18', name='check_age'),)
     
     
 class Teacher(db.Model):
@@ -59,8 +58,6 @@ class Kurses(db.Model):
     time = db.Column(db.Integer, nullable=False)
     cost = db.Column(db.Integer, nullable=False)
     dateStart = db.Column(db.String, nullable=False)
-    __table_args__ = (CheckConstraint('time >= 1 and time <=24 ', name='check_time'),)
-    __table_args__ = (CheckConstraint('cost <= 200000', name='check_cost'),)
 
     kurators = db.relationship('Kurator', backref = 'kurses', lazy = True)
 class Kurator(db.Model):
