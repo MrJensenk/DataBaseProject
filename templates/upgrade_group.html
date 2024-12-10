@@ -14,11 +14,11 @@
         <input type="text" name="titleGroup" value="{{ Group.titleGroup}}" required><br>
         <label>ID_teacher:</label><br>
         <input type="number" name="ID_teacher" value="{{ Group.ID_teacher }}" required><br>
-        <input type="submit" value="Сохранить">
+        <input type="submit"class="btn btn-primary" value="Сохранить">
     </form>
     <form method="POST" action="{{ url_for('delete_group', ID_group=Group.ID_group) }}">
         <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить эту группу?');">
     </form>
-    <a href="/groups">На главную</a>
+    <a href="/groups" class="btn btn-secondary">На главную</a>
 </body>
 </html>

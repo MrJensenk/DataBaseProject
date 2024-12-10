@@ -389,7 +389,7 @@ def add_kur():
             return "Преподаватель не найден", 404
 
         
-        new_kur = Kurses(ID_subject=int(ID_subject), ID_teacher=int(ID_teacher), title=title, time=time, cost=int(cost), dateStart=dateStart)
+        new_kur = Kurses(ID_subject=int(ID_subject), ID_teacher=int(ID_teacher), title=title, time=int(time), cost=int(cost), dateStart=dateStart)
         db.session.add(new_kur)
         db.session.commit()
         

@@ -18,11 +18,11 @@
         <input type="text" name="surname" value="{{ Teacher.surname }}" required><br>
         <label>Email:</label><br>
         <input type="email" name="email" value="{{ Teacher.email }}" required><br>
-        <input type="submit" value="Сохранить">
+        <input type="submit"class="btn btn-primary" value="Сохранить">
     </form>
     <form method="POST" action="{{ url_for('delete_teacher', ID_teacher=Teacher.ID_teacher) }}">
         <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этого преподавателя?');">
     </form>
-    <a href="/teachers">На главную</a>
+    <a href="/teachers" class="btn btn-secondary">На главную</a>
 </body>
 </html>

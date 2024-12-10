@@ -12,11 +12,11 @@
     <form method="POST">
         <label>Наименование:</label><br>
         <input type="text" name="title" value="{{ Subject.title }}" required><br>
-        <input type="submit" value="Сохранить">
+        <input type="submit" class="btn btn-primary" value="Сохранить">
     </form>
     <form method="POST" action="{{ url_for('delete_subject', ID_subject=Subject.ID_subject) }}">
         <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этот предмет?');">
     </form>
-    <a href="/subjects">На главную</a>
+    <a href="/subjects" class="btn btn-secondary">На главную</a>
 </body>
 </html>
