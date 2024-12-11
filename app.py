@@ -1,4 +1,5 @@
 from sqlalchemy import CheckConstraint, Column, Integer, String, ForeignKey
+from sqlalchemy.sql import func
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import csv
@@ -123,9 +124,13 @@ def view_students():
         query = query.filter(Student.age == age)
 
     students = query.paginate(page=page, per_page=25)
+    total_students = query.count()  # Общее количество студентов
+    average_age = query.with_entities(func.avg(Student.age)).scalar()  # Средний возраст
+    students_by_course = db.session.query(Student.ID_kur, func.count(Student.ID_student)).group_by(Student.ID_kur).all()
 
-    return render_template('students.html', students=students, name=name, surname=surname, age=age)
-
+    return render_template('students.html', students=students, name=name, surname=surname, age=age,
+                           total_students=total_students, average_age=average_age,
+                           students_by_course=students_by_course)
 
 @app.route('/students/add', methods=['GET', 'POST'])
 def add_student(): 

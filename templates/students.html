@@ -29,7 +29,17 @@
                 </div>
             </div>
         </form>
-
+        <div class="mb-4">
+            <h3>Статистика</h3>
+            <p>Общее количество студентов: <strong>{{ total_students }}</strong></p>
+            <p>Средний возраст студентов: <strong>{{ average_age | round(2) }}</strong></p>
+            <h4>Количество студентов у каждого куратора:</h4>
+            <ul>
+                {% for kurator_id, count in students_by_course %}
+                    <li>Куратор {{ kurator_id }}: <strong>{{ count }}</strong></li>
+                {% endfor %}
+            </ul>
+        </div>
         <table class="table table-bordered">
             <thead>
                 <tr>
