@@ -11,12 +11,10 @@
     <h1>Редактировать группу</h1>
     <form method="POST">
         <label>Название группы:</label><br>
-        <input type="text" name="titleGroup" value="{{ Group.titleGroup}}" required><br>
-        <label>ID_teacher:</label><br>
-        <input type="number" name="ID_teacher" value="{{ Group.ID_teacher }}" required><br>
+        <input type="text" name="group_name" value="{{ Group.group_name}}" required><br>
         <input type="submit"class="btn btn-primary" value="Сохранить">
     </form>
-    <form method="POST" action="{{ url_for('delete_group', ID_group=Group.ID_group) }}">
+    <form method="POST" action="{{ url_for('delete_group', group_id=Group.group_id) }}">
         <input type="submit" value="Удалить" onclick="return confirm('Вы уверены, что хотите удалить эту группу?');">
     </form>
     <a href="/groups" class="btn btn-secondary">На главную</a>
