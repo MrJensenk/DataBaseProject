@@ -128,6 +128,7 @@ def edit_product(product_id):
         product.name = request.form.get('name')
         product.brand_id = request.form.get('brand_id')
         product.group_id = request.form.get('group_id')
+        
         group = Group.query.get(product.group_id)
         if group is None:
             return "Группа не найдена", 404
@@ -135,10 +136,14 @@ def edit_product(product_id):
         brand = Brand.query.get(product.brand_id)
         if brand is None: 
             return "Бренд не найден", 404
+        
         db.session.commit()
         return redirect(url_for('view_products'))
+
+    # Получаем список всех товаров
+    all_products = Product.query.all()
     
-    return render_template('upgrade_product.html', Product=product)
+    return render_template('upgrade_product.html', Product=product, all_products=all_products)
 
 @app.route('/products/delete/<int:product_id>', methods=['POST'])
 def delete_product(product_id):

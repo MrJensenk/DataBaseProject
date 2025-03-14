@@ -16,6 +16,12 @@
         <input type="number" name="group_id" value="{{ Product.group_id }}" required><br>
         <label>Наименование:</label><br>
         <input type="text" name="name" value="{{ Product.name}}" required><br>
+        <h2>Список всех товаров:</h2>
+        <ul>
+            {% for prod in all_products %}
+                <li>ID: {{ prod.product_id }} - Название: {{ prod.name }}</li>
+            {% endfor %}
+        </ul>
         <input type="submit"class="btn btn-primary" value="Сохранить">
     </form>
     <form method="POST" action="{{ url_for('delete_product', product_id=Product.product_id) }}">
