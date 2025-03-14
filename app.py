@@ -123,7 +123,7 @@ def add_product():
 @app.route('/products/edit/<int:product_id>', methods=['GET', 'POST'])
 def edit_product(product_id):
     product = Product.query.get_or_404(product_id)
-    
+     
     if request.method == 'POST':
         product.name = request.form.get('name')
         product.brand_id = request.form.get('brand_id')
@@ -139,11 +139,11 @@ def edit_product(product_id):
         
         db.session.commit()
         return redirect(url_for('view_products'))
-
-    # Получаем список всех товаров
-    all_products = Product.query.all()
     
-    return render_template('upgrade_product.html', Product=product, all_products=all_products)
+    all_brands = Brand.query.all()
+    all_groups = Group.query.all()
+    
+    return render_template('upgrade_product.html', Product=product, all_brands=all_brands, all_groups=all_groups)
 
 @app.route('/products/delete/<int:product_id>', methods=['POST'])
 def delete_product(product_id):

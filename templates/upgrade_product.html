@@ -10,18 +10,24 @@
 <body>
     <h1>Редактировать изделие</h1>
     <form method="POST">
-        <label>ID бренда:</label><br>
-        <input type="number" name="brand_id" value="{{ Product.brand_id }}" required><br>
-        <label>ID группы изделий:</label><br>
-        <input type="number" name="group_id" value="{{ Product.group_id }}" required><br>
-        <label>Наименование:</label><br>
-        <input type="text" name="name" value="{{ Product.name}}" required><br>
-        <h2>Список всех товаров:</h2>
-        <ul>
-            {% for prod in all_products %}
-                <li>ID: {{ prod.product_id }} - Название: {{ prod.name }}</li>
+        <label for="brand_id">Бренд:</label>
+        <select name="brand_id" required>
+            {% for brand in all_brands %}
+                <option value="{{ brand.brand_id }}" {% if brand.brand_id == Product.brand_id %}selected{% endif %}>
+                    {{ brand.brand_name }}
+                </option>
             {% endfor %}
-        </ul>
+        </select><br><br>
+        <label for="group_id">Группа:</label>
+        <select name="group_id" required>
+            {% for group in all_groups %}
+                <option value="{{ group.group_id }}" {% if group.group_id == Product.group_id %}selected{% endif %}>
+                    {{ group.group_name }}
+                </option>
+            {% endfor %}
+        </select><br><br>
+        <label>Наименование:</label><br>
+        <input type="text" name="name" value="{{ Product.name}}" required><br><br>
         <input type="submit"class="btn btn-primary" value="Сохранить">
     </form>
     <form method="POST" action="{{ url_for('delete_product', product_id=Product.product_id) }}">
