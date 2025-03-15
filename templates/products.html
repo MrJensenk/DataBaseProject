@@ -37,8 +37,8 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>ID бренда</th>
-                    <th>ID группы изделий</th>
+                    <th>Бренд</th>
+                    <th>Группа изделия</th>
                     <th>Наименование</th>
                     <th>Действия</th>
                 </tr>
@@ -47,8 +47,8 @@
                 {% for product in products.items %}
                 <tr>
                     <td>{{ product.product_id }}</td>
-                    <td>{{ product.brand_id }}</td>
-                    <td>{{ product.group_id }}</td>
+                    <td>{{ brands[product.brand_id] }}</td>
+                    <td>{{ groups[product.group_id] }}</td>
                     <td>{{ product.name }}</td>
                     <td>
                         <a href="{{ url_for('edit_product', product_id=product.product_id) }}" class="btn btn-warning">Редактировать</a>
@@ -60,7 +60,9 @@
                 {% endfor %}
             </tbody>
         </table>
-
+        <div>
+            {{ products.links }}
+        </div>
         <div class="pagination">
             {% if products.has_prev %}
                 <a href="{{ url_for('view_products', page=products.prev_num, product_id=product_id, brand_id=brand_id, name=name) }}" class="btn btn-primary">Предыдущая</a>

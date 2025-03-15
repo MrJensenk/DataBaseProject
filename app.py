@@ -94,8 +94,12 @@ def view_products():
     products = query.paginate(page=page, per_page=25)
     total_products = query.count()
 
+    # Получаем все бренды и группы для отображения их названий
+    brands = {brand.brand_id: brand.brand_name for brand in Brand.query.all()}
+    groups = {group.group_id: group.group_name for group in Group.query.all()}
+
     return render_template('products.html', products=products, name=name, product_id=product_id, brand_id=brand_id,
-                           total_products=total_products)
+                           total_products=total_products, brands=brands, groups=groups)
 
 @app.route('/products/add', methods=['GET', 'POST'])
 def add_product(): 
